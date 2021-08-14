@@ -97,8 +97,9 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
         }
     }
     private static final String VALID_MATCHES = "[a-zA-Z0-9+\\\\]";
-    private static final char DECIMAL_SPLIT = '.';
-    private static final int MAX_RADIX = 64;
+    private static final char DECIMAL_SPLIT = '.'; // per U.S. standards; update as you wish
+    private static final char THOUSAND_SPLIT = ','; // per U.S. standards; update as you wish
+    private static final int MAX_RADIX = 64; // DO NOT MODIFY THIS LINE
 
     public static final AbstractNumber ZERO;
     public static final AbstractNumber ONE;
@@ -110,7 +111,7 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
     private final BigDecimal DECIMAL;
     private final int RADIX;
 
-    private int DECIMAL_LENGTH = 5; // this is the value set by HyperSkill
+    private int DECIMAL_LENGTH = 5; // this is the value requested by HyperSkill, can be updated with `setPrecision(int)`
 
     private boolean negative = false;
     private boolean isInteger;
@@ -363,13 +364,15 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
 
     /**@return a fancy {@link String} formatted with commas and a Negative (-) indicator*/
     public String formatNumber() {
-        return (isNegative() ? "(- NEG) " : "") + withCommas(toNumber().abs());
+        return (isNegative() ? "(- NEG) " : "") +
+                withCommas(this.DECIMAL.toString().split("\\.")[0]) +
+                this.DECIMAL.subtract(this.DECIMAL.setScale(0, RoundingMode.FLOOR)).toString().substring(1);
     }
 
     private String withCommas(BigDecimal number) {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < number.toString().length(); i++) {
-            if (i % 3 == 0 && i > 0) res.append(',');
+            if (i % 3 == 0 && i > 0) res.append(THOUSAND_SPLIT);
             res.append(number.toString().charAt(number.toString().length() - 1 - i));
         }
         return res.reverse().toString();
