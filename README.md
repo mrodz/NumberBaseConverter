@@ -7,7 +7,7 @@ The ` Main.java ` file contains an example implementation of this program, but t
 # AbstractNumber
 ### Constructors:
 <ol>
-  <li><tt>new AbstractNumber(String, int)</tt><br/>&nbsp; &nbsp; &nbsp; - where <tt>String</tt> is a valid 'number' that matches the regex <tt>[a-zA-Z0-9+\]</tt>, and <tt>int</tt> is the radix (base) of the number</li>
+  <li><tt>new AbstractNumber(String, int)</tt><br/>&nbsp; &nbsp; &nbsp; - where <tt>String</tt> is a valid 'number' that matches the regex <tt>[a-zA-Z0-9+\\]</tt>, and <tt>int</tt> is the radix (base) of the number</li>
   <li><tt>new AbstractNumber(BigDecimal)</tt><br/>&nbsp; &nbsp; &nbsp; - where <tt>BigDecimal</tt> takes a <u>BigDecimal</u> as its only parameter. The radix defaults to <tt>10</tt></li>
   <li><tt><strike>new AbstractNumber(long)</strike></tt><br/>&nbsp; &nbsp; &nbsp; @Deprecated - use <tt>AbstractNumber.valueOf(long)</tt> instead</li>
 </ol>
