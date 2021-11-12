@@ -119,7 +119,7 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
     /**
      * Most useful constructor to initialize an {@link AbstractNumber}.
      * @param hex valid {@link String} to serve as a number.
-     * @param radix the <i>base</i> to which this number is defined (incl. Base 0 - 64).
+     * @param radix the <i>base</i> to which this number is defined (incl. Base 2 - 64).
      * @throws IllegalArgumentException a digit in the <code>hex</code> is greater than or equal to the <code>radix</code> bound;
      *                                  there is an invalid digit (not found under {@link Instance});
      *                                  <code>radix</code> > {@link #MAX_RADIX}
