@@ -124,7 +124,7 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
      *                                  there is an invalid digit (not found under {@link Instance});
      *                                  <code>radix</code> > {@link #MAX_RADIX}
      */
-    AbstractNumber(String hex, int radix) throws IllegalArgumentException {
+    public AbstractNumber(String hex, int radix) throws IllegalArgumentException {
         if (hex.charAt(0) == '-') {
             hex = hex.substring(1);
             negative = true;
@@ -228,15 +228,17 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
      * @return {@code null} if the input is sufficient; the invalid bound as an {@link Integer}
      */
     public static Integer getInvalidBound(int... bounds) {
-        for (int i : bounds)
+        for (int i : bounds) {
             if (i > MAX_RADIX || i < 2) return i;
+        }
         return null;
     }
 
     public static char getInvalidHexInRadix(String hex, int radix) {
         hex = radix <= 36 ? hex.toUpperCase() : hex;
-        for (char c : hex.replaceAll("\\s++|\\.", "").toCharArray())
+        for (char c : hex.replaceAll("\\s++|\\.", "").toCharArray()) {
             if (getHexFromSymbol(c).value >= radix) return c;
+        }
         return (char) 0;
     }
 
@@ -285,9 +287,7 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
 
     private String hex(int radix) {
         BigDecimal integer = this.DECIMAL.setScale(0, RoundingMode.FLOOR);
-        BigDecimal decimal = this.DECIMAL.subtract(
-                this.DECIMAL.setScale(0, RoundingMode.FLOOR)
-        ).setScale(DECIMAL_LENGTH, RoundingMode.HALF_UP);
+        BigDecimal decimal = this.DECIMAL.subtract(this.DECIMAL.setScale(0, RoundingMode.FLOOR)).setScale(DECIMAL_LENGTH, RoundingMode.HALF_UP);
 
         String res = "";
 
@@ -315,15 +315,16 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
      */
     private String toHexRecursion0(BigDecimal bd, String base, int radix) {
         if (bd.equals(BigDecimal.ZERO)) return base;
-        return toHexRecursion0(bd.divide(BigDecimal.valueOf(radix), 0, RoundingMode.FLOOR), getInstanceFromValue(bd.remainder(BigDecimal.valueOf(radix))).symbol + base, radix);
+        return toHexRecursion0(bd.divide(BigDecimal.valueOf(radix), 0, RoundingMode.FLOOR), 
+                               getInstanceFromValue(bd.remainder(BigDecimal.valueOf(radix))).symbol + base, radix);
     }
+    
     private String toHexRecursion1(BigDecimal bd, String base, int reps, int radix) {
         //Current decimal value (not doubled), fits between 0-1.
         BigDecimal decimal = bd.subtract(bd.setScale(0, RoundingMode.FLOOR));
 
         //End case
-        if (decimal.compareTo(BigDecimal.ZERO) == 0 || reps >= DECIMAL_LENGTH)
-            return base;
+        if (decimal.compareTo(BigDecimal.ZERO) == 0 || reps >= DECIMAL_LENGTH) return base;
 
         decimal = decimal.multiply(BigDecimal.valueOf(radix));
         return toHexRecursion1(decimal, base + getInstanceFromValue(decimal.setScale(0, RoundingMode.FLOOR)).symbol, reps + 1, radix);
@@ -338,13 +339,8 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
                 ? this.HEX.split("\\.")
                 : new String[] {this.HEX, "0"};
 
-        return toNumberRecursion0(
-                number[0],
-                BigDecimal.ZERO,
-                number[0].length() - 1,
-                0,
-                this.RADIX
-        ).add(toNumberRecursion1(number[1], BigDecimal.ZERO, -1, 0, this.RADIX));
+        return toNumberRecursion0(number[0], BigDecimal.ZERO, number[0].length() - 1, 0, this.RADIX)
+                .add(toNumberRecursion1(number[1], BigDecimal.ZERO, -1, 0, this.RADIX));
     }
 
     private BigDecimal toNumberRecursion0(String integerHex, BigDecimal val, int pow, int pos, int radix) {
@@ -354,15 +350,16 @@ final class AbstractNumber implements Comparable<AbstractNumber> {
         ), pow - 1, pos + 1, radix);
     }
 
-
     private BigDecimal toNumberRecursion1(String decimalHex, BigDecimal val, int pow, int pos, int radix) {
         if (pos == decimalHex.length()) return val;
-        return toNumberRecursion1/*0*/(decimalHex, val.add(
+        return toNumberRecursion1(decimalHex, val.add(
                 BigDecimal.valueOf(getHexFromSymbol(decimalHex.charAt(pos)).value).multiply(BigDecimal.valueOf(radix).pow(pow, MathContext.DECIMAL128))
         ), pow - 1, pos + 1, radix);
     }
 
-    /**@return a fancy {@link String} formatted with commas and a Negative (-) indicator*/
+    /**
+     * @return a fancy {@link String} formatted with commas and a Negative (-) indicator
+     */
     public String formatNumber() {
         return (isNegative() ? "(- NEG) " : "") +
                 withCommas(this.DECIMAL.toString().split("\\.")[0]) +
